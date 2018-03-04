@@ -73,3 +73,19 @@ module.exports.readPostList = (event, ctx, cb) => {
             e => cb(e)
       );
 };
+
+module.exports.updatePost = (event, ctx, cb) => {
+      ctx.callbackWaitsForEmptyEventLoop = false;
+      const { title, body, tags } = JSON.parse(event.body);
+      const { id } = event.pathParameters;
+      connect().then(
+            () => Post.editPost({id, title, body, tags})
+      ).then(
+        post => {
+          if (!post) {
+            return cb(null, { statusCode: 404 });
+          }
+          cb(null, createResponse(200, post));
+        }
+      );
+};

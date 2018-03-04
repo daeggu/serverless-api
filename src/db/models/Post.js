@@ -39,5 +39,12 @@ PostSchema.statics.getLastPage = function(tag){
       return this.count(tag ? {tags: tag} : {}).exec() ;
 }
 
+PostSchema.statics.editPost = function({id, title, body, tags}){
+      return this.update(
+            {_id : id},
+            {title,body,tags}
+      ).exec();
+}
+
 global.Post = global.Post || mongoose.model('Post', PostSchema);
 module.exports = global.Post;

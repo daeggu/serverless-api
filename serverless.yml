@@ -22,6 +22,12 @@ functions:
       - http:
           path: posts
           method: get
+  updatePost:
+    handler: src/api/post.updatePost
+    events:
+      - http:
+          path: posts/{id}
+          method: patch
 
 plugins:
   - serverless-offline
