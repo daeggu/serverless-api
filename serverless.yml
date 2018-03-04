@@ -1,0 +1,20 @@
+service: serverless
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: ap-northeast-2
+  environment:
+    MONGO_URI: ${file(./serverless.env.yml):dev.MONGO_URI}
+    
+functions:
+  writePost:
+    handler: src/api/post.writePost
+    events:
+      - http:
+          path: posts
+          method: post
+
+plugins:
+  - serverless-offline

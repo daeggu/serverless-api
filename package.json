@@ -1,0 +1,15 @@
+{
+  "name": "serverless-api",
+  "version": "1.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-offline": "^3.18.0"
+  },
+  "dependencies": {
+    "mongoose": "^5.0.8"
+  },
+  "scripts": {
+    "test": "serverless offline start",
+    "deploy": "serverless deploy"
+  }
+}
