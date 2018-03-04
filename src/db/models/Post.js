@@ -40,10 +40,16 @@ PostSchema.statics.getLastPage = function(tag){
 }
 
 PostSchema.statics.editPost = function({id, title, body, tags}){
-      return this.update(
+      return this.findOneAndUpdate(
             {_id : id},
             {title,body,tags}
       ).exec();
+}
+
+PostSchema.statics.deletePost = function(id){
+      return this.remove({
+            _id: id
+      }).exec();
 }
 
 global.Post = global.Post || mongoose.model('Post', PostSchema);

@@ -28,6 +28,12 @@ functions:
       - http:
           path: posts/{id}
           method: patch
+  deletePost:
+    handler: src/api/post.deletePost
+    events:
+      - http:
+          path: posts/{id}
+          method: delete
 
 plugins:
   - serverless-offline
