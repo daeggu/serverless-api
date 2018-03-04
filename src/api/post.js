@@ -3,7 +3,10 @@ const {
       errorMessage,
       createResponse
 } = require('../lib/response');
-
+const {
+      LIST_SIZE
+} = process.env;
+const SIZE = parseInt(LIST_SIZE);
 const connect = require('../db');
 const Post = require('../db/models/Post');
 const Joi = require('joi');
@@ -12,7 +15,6 @@ module.exports.writePost = (event, ctx, cb) => {
       ctx.callbackWaitsForEmptyEventLoop = false;
       const body = JSON.parse(event.body);
 
-      //validation
       const schema = Joi.object().keys({
             title: Joi.string().required().min(3),
             body: Joi.string().required().min(3),
@@ -20,7 +22,7 @@ module.exports.writePost = (event, ctx, cb) => {
       });
       const result = Joi.validate(body, schema);
 
-      if(result.error){
+      if (result.error) {
             cb(null, errorMessage(codes.BAD_REQUEST, result.error.message));
             return;
       }
@@ -37,19 +39,37 @@ module.exports.writePost = (event, ctx, cb) => {
 
 module.exports.readPostList = (event, ctx, cb) => {
       ctx.callbackWaitsForEmptyEventLoop = false;
-      // const { page, tag } = event.queryStringParameters;
-      // if(parseInt(page || 1, 10) < 1) {
-      //       cb(null, errorMessage(codes.BAD_REQUEST, 'page < 1'));
-      //       return;
-      // }
-      // connect().then(
-      //       () => Post.getList({ page, tag})
-      // ).then(
-      //   postList => cb(null, createResponse(200, postList))
-      // );
+      if(event.queryStringParameters === null){
+            cb(null, errorMessage(codes.BAD_REQUEST, '[page] is mandatory field'));
+            return;
+      }
+     
+      const page = parseInt(event.queryStringParameters.page || 1, 10);
+      const {
+            tag
+      } = event.queryStringParameters;
+     
+      if (page < 1) {
+            cb(null, errorMessage(codes.BAD_REQUEST, 'page < 1'));
+            return;
+      }
+
+      let headerLastPage = null;
       connect().then(
-            () => Post.find().sort({ _id: -1 }).limit(5).lean().exec()
+            () => Post.getLastPage(tag)
       ).then(
-            PostList => cb(null, createResponse(200, PostList))
+            (totalSize) => {
+                  const lastPage = Math.ceil(totalSize/SIZE);
+                  headerLastPage = lastPage;
+            }
+      ).then(
+            () => Post.getList({ page, tag })
+      ).then(
+            (postList) => {
+                  const headers = { 'last-page': headerLastPage }
+                  cb(null, createResponse(200, postList, headers ))
+            }
+      ).catch(
+            e => cb(e)
       );
 };

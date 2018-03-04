@@ -1,5 +1,6 @@
-const createResponse = (status, body) => ({
+const createResponse = (status, body, headers) => ({
       statusCode: status,
+      headers,
       body: JSON.stringify(body)
 });
 
